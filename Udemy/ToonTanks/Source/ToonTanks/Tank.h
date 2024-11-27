@@ -25,6 +25,10 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void HandleDestruction() override;
+
+	TObjectPtr<APlayerController> GetPlayerController() const { return PlayerController; };
 	
 protected:
 	virtual void BeginPlay() override;
@@ -42,7 +46,5 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float TurnRate;
 
-	
-
-	TObjectPtr<APlayerController> PlayerControllerRef;
+	TObjectPtr<APlayerController> PlayerController;
 };

@@ -7,6 +7,8 @@
 #include "BasePawn.generated.h"
 
 class UCapsuleComponent;
+class AProjectile;
+class UHealthComponent;
 
 UCLASS()
 class TOONTANKS_API ABasePawn : public APawn
@@ -17,16 +19,24 @@ public:
 	// Sets default values for this pawn's properties
 	ABasePawn();
 
+	virtual void HandleDestruction();
 protected:
 	void RotateTurret(FVector LookAtTarget);
+	void Fire();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCapsuleComponent> CapsuleComp;	// 전방선언 적용
+		TObjectPtr<UCapsuleComponent> CapsuleComp;	// 전방선언 적용
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> BaseMesh;
+		TObjectPtr<UStaticMeshComponent> BaseMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> TurretMesh;
+		TObjectPtr<UStaticMeshComponent> TurretMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USceneComponent> ProjectileSpawnPoint;
+		TObjectPtr<USceneComponent> ProjectileSpawnPoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<UHealthComponent> Health;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+		float TurretTurnRate = 5.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+		TSubclassOf<AProjectile> ProjectileClass;
 };

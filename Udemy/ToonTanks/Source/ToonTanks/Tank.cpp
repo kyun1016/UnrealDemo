@@ -10,7 +10,7 @@
 
 ATank::ATank()
 	: Speed(500.0f)
-	, TurnRate(180.0f)
+	, TurnRate(90.0f)
 {
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArm->SetupAttachment(RootComponent);
@@ -26,6 +26,7 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ATank::Move);
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ATank::Turn);
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ATank::Fire);
 }
 
 // Called every frame
@@ -33,40 +34,38 @@ void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (PlayerControllerRef)
+	if (PlayerController)
 	{
 		FHitResult HitResult;
-		if (PlayerControllerRef->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult))
+		if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult))
 		{
-			DrawDebugSphere(
-				GetWorld(),
-				HitResult.ImpactPoint,
-				30.f,
-				12,
-				FColor::Red,
-				false,
-				-1.f
-			);
+			//DrawDebugSphere(
+			//	GetWorld(),
+			//	HitResult.ImpactPoint,
+			//	30.f,
+			//	12,
+			//	FColor::Red,
+			//	false,
+			//	-1.f
+			//);
 
 			RotateTurret(HitResult.ImpactPoint);
 		}
 	}
 }
 
+void ATank::HandleDestruction()
+{
+	Super::HandleDestruction();
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
+}
+
 void ATank::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerControllerRef = Cast<APlayerController>(GetController());
-	DrawDebugSphere(
-		GetWorld(),
-		GetActorLocation() + FVector(0.f, 0.f, 200.f),
-		100.f,
-		12,
-		FColor::Red,
-		true,
-		30.f
-	);
+	PlayerController = Cast<APlayerController>(GetController());
 }
 
 void ATank::Move(float Value)
