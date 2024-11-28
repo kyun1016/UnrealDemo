@@ -31,7 +31,7 @@ void ATower::BeginPlay()
 
 bool ATower::InFireRange()
 {
-	if (Tank)
+	if (Tank && Tank->bAlive)
 		return FVector::Dist(GetActorLocation(), Tank->GetActorLocation()) < FireRange;
 	return false;
 }

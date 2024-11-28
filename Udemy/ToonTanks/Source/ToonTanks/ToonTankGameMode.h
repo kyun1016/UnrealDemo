@@ -23,9 +23,12 @@ protected:
 	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintImplementableEvent)
 		void StartGame();
+	UFUNCTION(BlueprintImplementableEvent)
+		void GameOver(bool bWonGame);
 
 private:
 	void HandleGameStart();
+	int32 GetTargetTowerCount();
 
 private:
 	TObjectPtr<ATank> Tank;
@@ -33,4 +36,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
 		float StartDelay = 3.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GamePlay", meta = (AllowPrivateAccess = "true"))
+		int32 TargetTowers = 0;
 };

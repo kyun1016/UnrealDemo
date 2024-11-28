@@ -6,6 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Projectile.h"
 #include "HealthComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "Camera/CameraShakeBase.h"
 
 // Sets default values
 ABasePawn::ABasePawn()
@@ -32,6 +34,12 @@ ABasePawn::ABasePawn()
 void ABasePawn::HandleDestruction()
 {
 	// TODO: Visual/Sound Effects
+	if (DeathParticles)
+		UGameplayStatics::SpawnEmitterAtLocation(this, DeathParticles, GetActorLocation(), GetActorRotation());
+	if (DeathSound)
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
+	if (DeathCameraShakeClass)
+		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(DeathCameraShakeClass);
 }
 
 void ABasePawn::RotateTurret(FVector LookAtTarget)
@@ -49,15 +57,15 @@ void ABasePawn::RotateTurret(FVector LookAtTarget)
 
 void ABasePawn::Fire()
 {
-	DrawDebugSphere(
-		GetWorld(),
-		ProjectileSpawnPoint->GetComponentLocation(),
-		30.f,
-		12,
-		FColor::Red,
-		false,
-		3.f
-	);
+	//DrawDebugSphere(
+	//	GetWorld(),
+	//	ProjectileSpawnPoint->GetComponentLocation(),
+	//	30.f,
+	//	12,
+	//	FColor::Red,
+	//	false,
+	//	3.f
+	//);
 	GetWorld()->SpawnActor<AProjectile>(
 		ProjectileClass,
 		ProjectileSpawnPoint->GetComponentLocation(),

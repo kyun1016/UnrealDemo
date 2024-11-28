@@ -9,6 +9,9 @@
 class UCapsuleComponent;
 class AProjectile;
 class UHealthComponent;
+class UParticleSystem;
+class USoundBase;
+class UCameraShakeBase;
 
 UCLASS()
 class TOONTANKS_API ABasePawn : public APawn
@@ -33,10 +36,16 @@ private:
 		TObjectPtr<UStaticMeshComponent> TurretMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<USceneComponent> ProjectileSpawnPoint;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UHealthComponent> Health;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<UParticleSystem> DeathParticles;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 		float TurretTurnRate = 5.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 		TSubclassOf<AProjectile> ProjectileClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<USoundBase> DeathSound;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<UCameraShakeBase> DeathCameraShakeClass;
 };

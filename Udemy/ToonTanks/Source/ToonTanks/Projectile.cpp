@@ -6,6 +6,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/DamageType.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Camera/CameraShakeBase.h"
 
 // Sets default values
 AProjectile::AProjectile()
@@ -20,6 +23,8 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent->MaxSpeed = 1300.f;
 	ProjectileMovementComponent->InitialSpeed = 1300.f;
 
+	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Smoke Trail"));
+	TrailParticles->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -28,7 +33,8 @@ void AProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
-	UE_LOG(LogTemp, Warning, TEXT("Ready"));
+	if (LaunchSound)
+		UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation(), GetActorRotation());
 }
 
 // Called every frame
@@ -40,16 +46,31 @@ void AProjectile::Tick(float DeltaTime)
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor == nullptr) return;
-	if (OtherActor == this) return;
-	
+	if (OtherActor == nullptr || OtherActor == this)
+	{
+		Destroy();
+		return;
+	}
+
 	TObjectPtr<AActor> MyOwner = GetOwner();
-	if (MyOwner == nullptr) return;
-	if (OtherActor == MyOwner) return;
+	if (MyOwner && OtherActor != MyOwner)
+	{
+		TObjectPtr<AController> MyOwnerInstigator = MyOwner->GetInstigatorController();
+		TObjectPtr<UClass> DamageTypeClass = UDamageType::StaticClass();
 
-	TObjectPtr<AController> MyOwnerInstigator = MyOwner->GetInstigatorController();
-	TObjectPtr<UClass> DamageTypeClass = UDamageType::StaticClass();
-
-	UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwnerInstigator, MyOwner, DamageTypeClass);
+		UGameplayStatics::ApplyDamage(
+			OtherActor,
+			Damage,
+			MyOwnerInstigator,
+			MyOwner,
+			DamageTypeClass
+		);
+		if (HitParticles)
+			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
+		if (HitSound)
+			UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation(), GetActorRotation());
+		if (HitCameraShakeClass)
+			GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitCameraShakeClass);
+	}
 	Destroy();
 }

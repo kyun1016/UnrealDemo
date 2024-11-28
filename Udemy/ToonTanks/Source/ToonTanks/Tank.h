@@ -29,7 +29,8 @@ public:
 	virtual void HandleDestruction() override;
 
 	TObjectPtr<APlayerController> GetPlayerController() const { return PlayerController; };
-	
+
+	bool bAlive = true;
 protected:
 	virtual void BeginPlay() override;
 
